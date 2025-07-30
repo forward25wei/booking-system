@@ -57,8 +57,11 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '5');
     
     let appointments;
+    let totalAppointments = 0;
     
     if (date) {
       // 如果提供了日期参数，获取特定日期的预约
@@ -70,12 +73,31 @@ export async function GET(request: NextRequest) {
         );
       }
       appointments = await getAppointmentsByDate(appointmentDate);
+      totalAppointments = appointments.length;
+      
+      // 简单的内存分页
+      appointments = appointments.slice((page - 1) * pageSize, page * pageSize);
     } else {
-      // 否则获取所有预约
-      appointments = await getAppointments();
+      // 获取所有预约并进行分页
+      const allAppointments = await getAppointments();
+      totalAppointments = allAppointments.length;
+      
+      // 简单的内存分页
+      appointments = allAppointments.slice((page - 1) * pageSize, page * pageSize);
     }
     
-    return NextResponse.json({ success: true, data: appointments });
+    const totalPages = Math.ceil(totalAppointments / pageSize);
+    
+    return NextResponse.json({ 
+      success: true, 
+      appointments: appointments,
+      pagination: {
+        total: totalAppointments,
+        page: page,
+        pageSize: pageSize,
+        totalPages: totalPages
+      }
+    });
   } catch (error) {
     console.error('获取预约列表失败:', error);
     return NextResponse.json(

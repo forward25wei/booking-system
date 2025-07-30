@@ -7,12 +7,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 interface DatePickerProps {
   selectedDate: Date | null;
-  onChange: (date: Date | null) => void;
+  onChange: (date: Date) => void;
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onChange }) => {
   const today = new Date();
-  
+
   return (
     <div className="w-full">
       <h2 className="text-xl font-bold mb-4">选择咨询日期</h2>

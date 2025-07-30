@@ -1,112 +1,106 @@
 'use client';
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-
-interface UserFormProps {
-  onSubmit: (data: UserFormData) => void;
-  isSubmitting: boolean;
-}
 
 export interface UserFormData {
   user_name: string;
   phone: string;
-  contactInfo?: string;
-  notes?: string;
+  contact_info: string;
+  notes: string;
 }
 
-const schema = yup.object().shape({
-  user_name: yup.string().required('请输入姓名'),
-  phone: yup
-    .string()
-    .required('请输入手机号码')
-    .matches(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
-  contactInfo: yup.string(),
-  notes: yup.string(),
-});
+interface UserFormProps {
+  onSubmit: (e: React.FormEvent) => Promise<void>;
+  isSubmitting: boolean;
+  isEditing?: boolean;
+  initialData?: UserFormData;
+}
 
-const UserForm: React.FC<UserFormProps> = ({ onSubmit, isSubmitting }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UserFormData>({
-    resolver: yupResolver(schema),
-  });
-
+export default function UserForm({ 
+  onSubmit, 
+  isSubmitting, 
+  isEditing = false,
+  initialData
+}: UserFormProps) {
   return (
-    <div className="w-full">
-      <h2 className="text-xl font-bold mb-4">填写个人信息</h2>
-      <div className="bg-zinc-800 rounded-lg p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label htmlFor="user_name" className="block text-sm font-medium mb-1">
-              姓名 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="user_name"
-              type="text"
-              {...register('user_name')}
-              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            {errors.user_name && (
-              <p className="mt-1 text-sm text-red-500">{errors.user_name.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium mb-1">
-              手机号码 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="phone"
-              type="tel"
-              {...register('phone')}
-              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            {errors.phone && (
-              <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="contactInfo" className="block text-sm font-medium mb-1">
-              其他联系方式（选填）
-            </label>
-            <input
-              id="contactInfo"
-              type="text"
-              {...register('contactInfo')}
-              placeholder="微信、邮箱等"
-              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="notes" className="block text-sm font-medium mb-1">
-              备注信息（选填）
-            </label>
-            <textarea
-              id="notes"
-              {...register('notes')}
-              rows={3}
-              className="w-full p-2 bg-zinc-700 border border-zinc-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? '提交中...' : '提交预约'}
-          </button>
-        </form>
-      </div>
+    <div className="bg-zinc-800 rounded-lg p-6">
+      <h2 className="text-xl font-bold mb-6">
+        {isEditing ? '编辑预约信息' : '填写您的信息'}
+      </h2>
+      
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="user_name" className="block text-sm font-medium mb-1">
+            姓名 <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="user_name"
+            name="user_name"
+            className="w-full p-2 rounded-md bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            placeholder="请输入您的姓名"
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium mb-1">
+            手机号码 <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            className="w-full p-2 rounded-md bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            placeholder="请输入您的手机号码"
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="contactInfo" className="block text-sm font-medium mb-1">
+            其他联系方式
+          </label>
+          <input
+            type="text"
+            id="contactInfo"
+            name="contactInfo"
+            className="w-full p-2 rounded-md bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            placeholder="微信/邮箱等（选填）"
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="notes" className="block text-sm font-medium mb-1">
+            备注信息
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={3}
+            className="w-full p-2 rounded-md bg-zinc-700 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            placeholder="您可以在这里填写其他需要说明的信息（选填）"
+          ></textarea>
+        </div>
+        
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full mt-6 py-2 px-4 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-red-600"
+        >
+          {isSubmitting ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              处理中...
+            </span>
+          ) : (
+            <span>{isEditing ? '更新预约' : '提交预约'}</span>
+          )}
+        </button>
+      </form>
     </div>
   );
-};
-
-export default UserForm;
+}

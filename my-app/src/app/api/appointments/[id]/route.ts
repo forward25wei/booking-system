@@ -14,9 +14,9 @@ function validateDate(dateString: string): boolean {
 }
 
 // 获取单个预约
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id;
+    const { id } = await params;
     
     const result = await sql`
       SELECT * FROM appointments WHERE id = ${id}
@@ -34,9 +34,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // 更新预约
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id;
+    const { id } = await params;
     const body = await request.json();
     
     // 验证必填字段
@@ -85,9 +85,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // 删除预约
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id;
+    const { id } = await params;
     
     // 检查预约是否存在
     const existingResult = await sql`

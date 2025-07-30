@@ -54,10 +54,10 @@ export async function createAppointment(data: Appointment): Promise<any> {
 
 export async function getAppointments(): Promise<Appointment[]> {
   try {
-    const appointments = await sql<Appointment[]>`
+    const result = await sql`
       SELECT * FROM appointments ORDER BY appointment_date DESC, appointment_time ASC;
     `;
-    return appointments;
+    return result as Appointment[];
   } catch (error) {
     console.error('获取预约列表失败:', error);
     throw error;
@@ -66,12 +66,12 @@ export async function getAppointments(): Promise<Appointment[]> {
 
 export async function getAppointmentsByDate(date: Date): Promise<Appointment[]> {
   try {
-    const appointments = await sql<Appointment[]>`
+    const result = await sql`
       SELECT * FROM appointments 
       WHERE appointment_date = ${date} 
       ORDER BY appointment_time ASC;
     `;
-    return appointments;
+    return result as Appointment[];
   } catch (error) {
     console.error('获取指定日期预约失败:', error);
     throw error;
